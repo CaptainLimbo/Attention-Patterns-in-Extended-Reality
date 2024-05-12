@@ -31,8 +31,8 @@ AR_USED_COLUMNS = [
     "RightEyeOpenAmount",
     "LeftEyeCenter",
     "RightEyeCenter",
-    "LeftEyeGazeDirection",
-    "RightEyeGazeDirection",
+    "LeftEyeGazeDirectionPuzzle",
+    "RightEyeGazeDirectionPuzzle",
     "IntersectWithUseful",
     "IntersectWithNormal",
     "IntersectWithPuzzle",
@@ -52,10 +52,6 @@ VR_USED_COLUMNS = [
     "MascotDistraction",
 ]
 
-
-start_index = AR_USED_COLUMNS.index("LeftEyeGazeDirection")
-AR_USED_COLUMNS_2D = AR_USED_COLUMNS[:start_index] + ["LeftEyeGazeDirectionCube",
-    "RightEyeGazeDirectionCube"] + AR_USED_COLUMNS[start_index+2:]
 
 
 def merge_VR_intersections(df):

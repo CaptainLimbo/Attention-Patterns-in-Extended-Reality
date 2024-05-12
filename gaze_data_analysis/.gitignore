@@ -1,5 +1,0 @@
-dataset
-prediction/test.py
-**/__pycache__/*
-**/*.csv
-**/*.test.py
