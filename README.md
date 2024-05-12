@@ -4,4 +4,4 @@ This is the code repo for ISMAR'24 Submission #6227. Code has been processed to 
 ![Figure 1](setup.png)
 
 
-Please refer to [first order analysis](gaze_data_analysis/README.md) and [machine learning](mvts_transformer/README_Sudoku.md) for code descriptions. Sample data is provided in [dataset](dataset)
+Please refer to [first order analysis](gaze_data_analysis/README.md) and [machine learning](mvts_transformer/README_Sudoku.md) for code descriptions. Sample data is provided in [dataset](dataset). Please be aware that anonymous github might hide files from viewers in the website, but one can type in the address bar `/dataset/AR_samples/p1/p1_final.csv` or  `/dataset/VR_samples/p1/p1_final.csv` to view those sample data files.
