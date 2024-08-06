@@ -1,7 +1,24 @@
 # Attention-Patterns-in-Extended-Reality
-This is the code repo for ISMAR'24 Submission #6227. Code has been processed to be anonymous, in which we replace the university mascot with "mascot" and provided sample dataset with the same features but not revealing the raw data we collected. Our study setup is shown in Figure 1.
-
+This is the official code repo for our ISMAR '24 paper, *"Looking" into Attention Patterns in Extended Reality: An Eye Tracking-Based Study* by Zhehan Qu, Ryleigh Byrne and [Maria Gorlatova](https://maria.gorlatova.com/current-research/). The Arxiv version of the paper can be found [here](temp). The overview of our study is shown in Figure 1.
 ![Figure 1](setup.png)
 
+If you are interested, please also check out the video demos of our AR and VR apps (click on the images to go to YouTube).
 
-Please refer to [first order analysis](gaze_data_analysis/README.md) and [machine learning](mvts_transformer/README_Sudoku.md) for code descriptions. Sample data is provided in [dataset](dataset). Please be aware that anonymous github might hide files from viewers in the website, but one can type in the address bar `/dataset/AR_samples/p1/p1_final.csv` or  `/dataset/VR_samples/p1/p1_final.csv` to view those sample data files. [Sample link to AR data](/dataset/AR_samples/p1/p1_final.csv)
+### AR Demo Video
+[![Watch the video](https://img.youtube.com/vi/k2SwEOOD1SQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=WvbAxP_ZsGw)
+
+### VR Demo Video
+[![Watch the video](https://img.youtube.com/vi/WvbAxP_ZsGw/maxresdefault.jpg)](https://www.youtube.com/watch?v=WvbAxP_ZsGw)
+
+
+Please refer to the individual READMEs at [first order analysis](gaze_data_analysis/README.md), [machine learning](mvts_transformer/README_Sudoku.md) and [sudoku_hint_generator](mvts_transformer/README_Sudoku.md) for code descriptions. Unfortunately, due to our IRB protocol we cannot release the eye gaze data we collected. Sample data are provided in [dataset](dataset) to show the format. 
+
+If you find this code or any idea in the paper useful, please consider citing:
+```
+@INPROCEEDINGS{qu2024looking,
+  author={Qu, Zhehan and Byrne, Ryleigh and Gorlatova, Maria},
+  booktitle={Proceedings of IEEE ISMAR}, 
+  title={``Looking'' into Attention Patterns in Extended Reality: An Eye Tracking-Based Study}, 
+  year={2024},
+}
+```

@@ -258,7 +258,7 @@ def extract_from_dfs(
                 index += step_size
 
         label_num = 3
-
+        # append to the labels so that the one hot encoding can be done properly, even if not all labels are present in one user's data
         label_df = pd.get_dummies(labels + list(range(label_num))).astype("float32")
 
         # drop the added ones
@@ -318,8 +318,7 @@ def convert_raw_data(
     normalize=True,
     split_strategy="time",
     window_size=120,
-    step_size=60,
-    use_2D_direction=False,
+    step_size=120,
     label=None,
     use_center=True, use_amount=False, use_target=False
 ):
@@ -340,8 +339,6 @@ def convert_raw_data(
                     continue
                 reference_df = pd.read_csv(os.path.join(root, file))
                 if flag == "AR":
-                    reference_df = reference_df.loc[(reference_df[left_normalizer_name] != 0.000) & (reference_df[right_normalizer_name] != 0.000)]
-                    reference_df = reference_df.loc[(reference_df[left_normalizer_name] != 1.000) & (reference_df[right_normalizer_name] != 1.000)]
                     scale_left, scale_right = MinMaxScaler(), MinMaxScaler()
                     scale_left.fit(reference_df[left_normalizer_name].values.reshape(-1, 1))
                     scale_right.fit(
@@ -357,15 +354,14 @@ def convert_raw_data(
                 if owner not in participants:
                     continue
                 use_columns = AR_USED_COLUMNS if "AR" in read_root_path else VR_USED_COLUMNS
-                ts_label=None if label is None else label[participants.index(owner)]
+                ts_label=None if label is None else label[owner-1]
                 dataframe = pd.read_csv(os.path.join(root, file), usecols=use_columns)
                 # normalize only those that are not -1
                 
                 if normalize and flag == "AR":
-                    dataframe = dataframe.loc[(dataframe[left_normalizer_name] != -1.0) & (dataframe[right_normalizer_name] != -1.0)]                    
-                    dataframe[left_normalizer_name] = normalize_column(dataframe[left_normalizer_name].values.reshape(-1, 1), open_amount_distribution[owner][0], outliers=[-1.0] if flag == "VR" else [0.000, 1.000])
-                    dataframe[right_normalizer_name] = normalize_column(dataframe[right_normalizer_name].values.reshape(-1, 1), open_amount_distribution[owner][1], outliers=[-1.0] if flag == "VR" else [0.000, 1.000])
-                    pass
+                                    
+                    dataframe[left_normalizer_name] = open_amount_distribution[owner][0].transform(dataframe[left_normalizer_name].values.reshape(-1, 1)).round(3)
+                    dataframe[right_normalizer_name] = open_amount_distribution[owner][1].transform(dataframe[right_normalizer_name].values.reshape(-1, 1)).round(3)
                 
                 if split_strategy == "time":
                     (
@@ -379,7 +375,6 @@ def convert_raw_data(
                         window_size=window_size,
                         step_size=step_size,
                         split=split_strategy,
-                        use_2D_direction=use_2D_direction,
                         ts_label=ts_label,
                         use_center=use_center,
                         use_amount=use_amount,
@@ -434,7 +429,7 @@ def normalize_column(array, normalizer, outliers=-1.0):
     
 
 def get_train_val_test_by_time(
-    total_time, val_ratio=0.1, test_ratio=0.1, minimum_time=60, no_test=True, no_val=False
+    total_time, val_ratio=0.1, test_ratio=0.1, minimum_time=60, no_test=False, no_val=False
 ):
     """
     find two non-overlapping intervals of length val_ratio and test_ratio in the total time. If < minimum_time, find length = minimum_time
@@ -462,5 +457,5 @@ def get_train_val_test_by_time(
 
 if __name__ == "__main__":
     np.random.seed(42)
-    convert_raw_data("datasets/AR_samples", "datasets/Sudoku_Split_Time/AR_direction_center_target/Mascot", use_2D_direction=True, label=None, use_center=True, use_amount=False, use_target=True)
-    convert_raw_data("datasets/AR_samples", "datasets/Sudoku_Split_Time/AR_direction_amount_target/ACS", use_2D_direction=True, label=list(map(grouping_ACS, AR_ACS)), use_center=False, use_amount=True, use_target=True)
+    convert_raw_data("datasets/AR_samples", "datasets/Sudoku_Split_Time/AR_direction_center_target/Mascot", label=None, use_center=True, use_amount=False, use_target=True)
+    convert_raw_data("datasets/AR_samples", "datasets/Sudoku_Split_Time/AR_direction_amount_target/ACS", label=list(map(grouping_ACS, AR_ACS)), use_center=False, use_amount=True, use_target=True)

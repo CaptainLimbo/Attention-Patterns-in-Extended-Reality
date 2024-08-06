@@ -7,7 +7,7 @@ import json
 import offline.modules as m
 from offline.data import SudokuARGazeData, SudokuVRGazeData, aggregate_data
 
-DATA_DIR = "datasets/AR"
+DATA_DIR = "dataset/AR_samples"
 ROIS = ["puzzle", "hints", "timer", "progressbar", "mascot"]
 LABELS = [0, 1, 3]
 PARTICIPANTS = list(range(1, 20))
@@ -43,14 +43,13 @@ def write_data_to_results(data_list, duration_list, results, identifier="base", 
 if __name__ == "__main__":
 
     modules = [
-        m.MedianFilter(attr="gaze_direction", window_size=3),
-        m.DurationDistanceVelocity(window_size=3),
+        m.DurationDistanceVelocity(window_size=3), 
         m.SavgolFilter(attr="velocity", window_size=3, order=1),
         m.IVTFixationDetector(velocity_threshold=30),
-        m.AggregateFixations(interval_steps_tolerance=4),
+        m.AggregateFixations(),
         m.SmoothPursuitDetector(low_velocity_threshold=30, high_velocity_threshold=100),
         m.AggregateSmoothPursuits(
-            aggregate_to_fixations=True, interval_steps_tolerance=4
+            aggregate_to_fixations=True, 
         ),
         m.IVTSaccadeDetector(velocity_threshold=30),
         m.AggregateSaccades(),
@@ -75,6 +74,8 @@ if __name__ == "__main__":
                 continue
 
             label_data = SudokuARGazeData(os.path.join(root, file)) if "AR" in DATA_DIR else SudokuVRGazeData(os.path.join(root, file))
+            if not label_data.is_data_useable():
+                continue
             total_duration = label_data.get_total_duration()
             if "base" in file:
                 for module in modules:
@@ -82,22 +83,26 @@ if __name__ == "__main__":
                 write_data_to_results([label_data], [total_duration], results, identifier="base")
             else:
                 for i, label in enumerate(LABELS):
-                    data = copy.deepcopy(label_data)
-                    slice_result = data.slice_label(label)
+                    period_data =  SudokuARGazeData(os.path.join(root, file), label=label) if "AR" in DATA_DIR else SudokuVRGazeData(os.path.join(root, file), label=label)
+                    
+                    slice_result = period_data.is_data_useable()
 
                     if not slice_result:
                         final_data_label[i].append(None)
                         final_duration_label[i].append(0)
                     else:
-                        duration = data.get_total_duration()
+                        duration = period_data.get_total_duration()
                         for module in modules:
-                            data = module.update(data)
-                        final_data_label[i].append(data)
+                            period_data = module.update(period_data)
+                        final_data_label[i].append(period_data)
                         final_duration_label[i].append(duration)
                     if len(final_data_label[i]) == count_final:
                         write_data_to_results([data for data in final_data_label[i] if data], final_duration_label[i], results, identifier="final", label_index=i)
                         final_data_label[i], final_duration_label[i] = [], []
-            
+                # full trial
+                label_data =  SudokuARGazeData(os.path.join(root, file)) if "AR" in DATA_DIR else SudokuVRGazeData(os.path.join(root, file))
+                if not label_data.is_data_useable():
+                    continue
                 for module in modules:
                     label_data = module.update(label_data)
                 final_data.append(label_data)
@@ -107,4 +112,4 @@ if __name__ == "__main__":
                     final_data, final_duration = [], []
 
     for name, result in results.items():
-        np.savetxt(f"AR_{name}.csv", result, delimiter=",")
+        np.savetxt(f"{'AR' if 'AR' in DATA_DIR else 'VR'}_{name}.csv", result, delimiter=",")

@@ -9,9 +9,9 @@ class FixationMetrics(Module):
     def update(self, data: GazeData) -> GazeData:
         fixation_metrics = {
             "count": 0,
-            "duration_total": 0,
+            "fixation_time_prop": 0,
             "duration_mean": 0,
-            "duration_std": 0,
+            "fixation_rate": 0,
             "time_to_first": 0,
         }
 
@@ -19,9 +19,9 @@ class FixationMetrics(Module):
             fixation_metrics["count"] = len(data.fixations)
 
             durations = np.array([fixation["duration"] for fixation in data.fixations])
-            fixation_metrics["duration_total"] = np.sum(durations)
+            fixation_metrics["fixation_time_prop"] = np.sum(durations) / data.get_total_duration()
             fixation_metrics["duration_mean"] = np.mean(durations)
-            fixation_metrics["duration_std"] = np.std(durations)
+            fixation_metrics["fixation_rate"] = len(data.fixations) / data.get_total_duration()
             fixation_metrics["time_to_first"] = (
                 data.fixations[0]["start_timestamp"] - data.start_timestamp[0]
             )
@@ -29,7 +29,7 @@ class FixationMetrics(Module):
         data.fixation_metrics = fixation_metrics
 
         return data
-
+    
 
 class SaccadeMetrics(Module):
     def update(self, data: GazeData) -> GazeData:
@@ -118,7 +118,6 @@ class SmoothPursuitMetrics(Module):
 
         return data
 
-
 class ROIMetrics(Module):
     def __init__(self, rois: List[str]) -> None:
         self.rois = rois
@@ -126,37 +125,26 @@ class ROIMetrics(Module):
     def update(self, data: GazeData) -> GazeData:
         roi_metrics = {}
 
-        for roi in self.rois:  #  + ["other"]:
-            # roi_metrics[f"{roi}_count_prop"] = 0
+        for roi in self.rois: 
             roi_metrics[f"{roi}_count"] = 0
             roi_metrics[f"{roi}_duration_total"] = 0
             roi_metrics[f"{roi}_duration_mean"] = 0
-            roi_metrics[f"{roi}_duration_std"] = 0
+            roi_metrics[f"{roi}_fixation_rate"] = 0
+            roi_metrics[f"{roi}_fixation_prop"] = 0
+
 
             fixations = [
                 fixation for fixation in data.fixations if fixation["target"] == roi
             ]
 
             if len(fixations) > 0:
-                # roi_metrics[f"{roi}_count_prop"] = len(fixations) / len(data.fixations)
                 roi_metrics[f"{roi}_count"] = len(fixations)
 
                 durations = np.array([fixation["duration"] for fixation in fixations])
                 roi_metrics[f"{roi}_duration_total"] = np.sum(durations)
                 roi_metrics[f"{roi}_duration_mean"] = np.mean(durations)
-                roi_metrics[f"{roi}_duration_std"] = np.std(durations)
-
-        for roi_1 in self.rois:
-            for roi_2 in self.rois:
-                roi_1_to_roi_2 = 0
-                for i in range(len(data.fixations) - 1):
-                    if (
-                        data.fixations[i]["target"] == roi_1
-                        and data.fixations[i + 1]["target"] == roi_2
-                    ):
-                        roi_1_to_roi_2 += 1
-
-                roi_metrics[f"{roi_1}_to_{roi_2}_count"] = roi_1_to_roi_2
+                roi_metrics[f"{roi}_fixation_rate"] =  np.sum(durations)
+                roi_metrics[f"{roi}_fixation_prop"] = np.mean(durations)
 
         data.roi_metrics = roi_metrics
 

@@ -4,7 +4,7 @@ This is the sub-repo for extracting gaze metrics, including fixations, saccades 
 
 ## Data
 ### Collected Raw Data
-Due to privacy concerns we cannot open-source our data. However, sample data are provided at [AR samples](../dataset/AR_samples) and [VR samples](../dataset/VR_samples), with the same column names and placeholders showing the format of the data we collected. While most columns have the same meanings, serveral differences between the AR and VR data are listed as follows:
+Due to privacy concerns we **cannot** release our data. However, sample data are provided at [AR samples](../dataset/AR_samples) and [VR samples](../dataset/VR_samples), with the same column names and placeholders showing the format of the data we collected. While most columns have the same meanings, serveral differences between the AR and VR data are listed as follows:
 
 1. AR data was collected at 60Hz, while VR data was collected at 120Hz;
 2. Besides than gaze directions, AR data futher include eyes open amount and 3D eye center positions, while VR data have pupil dilations

@@ -271,6 +271,9 @@ def main(config):
     # Initialize data generators
     dataset_class, collate_fn, runner_class = pipeline_factory(config)
     val_dataset = dataset_class(val_data, val_indices)
+    val_labels = val_data.labels_df
+    val_labels = val_labels.idxmax(axis=1).values.flatten().astype(int)
+    val_label_dist = np.bincount(val_labels)
 
     val_loader = DataLoader(
         dataset=val_dataset,
@@ -436,6 +439,7 @@ def main(config):
     if config["task"] == "classification":
         test_labels = test_data.labels_df
         test_labels = test_labels.idxmax(axis=1).values.flatten().astype(int)
+        test_label_dist = np.bincount(test_labels)
 
         test_dataset = dataset_class(test_data, test_indices)
         model = utils.load_model(
@@ -460,7 +464,7 @@ def main(config):
             print_interval=config["print_interval"],
             console=config["console"],
         )
-        aggr_metrics_test, per_batch_test = test_evaluator.evaluate(keep_all=True)
+        aggr_metrics_test, _ = test_evaluator.evaluate(keep_all=True)
         print_str = "Test Summary: "
         for k, v in aggr_metrics_test.items():
             if k == "epoch":
@@ -476,10 +480,17 @@ def main(config):
         )
     )
 
+    with open(f"log_{'VR' if 'VR' in config['data_dir'] else 'AR'}_camera_{'ACS' if 'ACS' in config['data_dir'] else 'trial'}_accuracy.txt", "a") as f:
+        f.write(f"{config['data_dir']} - Pretrain: {config['change_output']}: {config['epochs']}; Test ACC: {aggr_metrics_test['accuracy']:.4f}; Majority: {test_label_dist.max() / test_label_dist.sum():.4f}; Val ACC: {best_metrics['accuracy']:.4f}; Majority: {val_label_dist.max() / val_label_dist.sum():.4f}\n")
+
+
+    with open(f"log_{'VR' if 'VR' in config['data_dir'] else 'AR'}_camera_{'ACS' if 'ACS' in config['data_dir'] else 'trial'}_AUC.txt", "a") as f:
+        f.write(f"{config['data_dir']} - Pretrain: {config['change_output']}: {config['epochs']}; Test AUC:{aggr_metrics_test['MacroAUC']:.4f}; Val AUC: {best_metrics['MacroAUC']:.4f}\n")
+
     return best_value
 
 
 if __name__ == "__main__":
-    args = Options().parse()  # `argsparse` object
-    config = setup(args)  # configuration dictionary
+    args = Options().parse()
+    config = setup(args)
     main(config)

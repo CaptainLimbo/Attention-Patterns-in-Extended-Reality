@@ -708,7 +708,6 @@ class SudokuData(BaseData):
 
     @staticmethod
     def select_columns(df):
-        """"""
         return df
 
 

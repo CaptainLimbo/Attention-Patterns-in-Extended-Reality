@@ -623,6 +623,8 @@ class SupervisedRunner(BaseRunner):
                     targets, probs[:, 1]
                 )
                 self.epoch_metrics["AUPRC"] = sklearn.metrics.auc(rec, prec)
+                
+            self.epoch_metrics["MacroAUC"] = sklearn.metrics.roc_auc_score(targets, probs, multi_class="ovo", average="macro") if self.model.num_classes > 2 else sklearn.metrics.roc_auc_score(targets, probs[:, 1], multi_class="ovo", average="macro")
 
         if keep_all:
             return self.epoch_metrics, per_batch

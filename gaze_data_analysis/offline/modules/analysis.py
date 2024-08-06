@@ -1,4 +1,3 @@
-from hmmlearn import hmm
 import numpy as np
 from typing import Optional, Dict
 
@@ -21,7 +20,6 @@ class IVTSaccadeDetector(Module):
         self.velocity_threshold = velocity_threshold
 
     def update(self, data: GazeData) -> GazeData:
-        # saccade should be neg of fixation
         data.saccade = ~data.fixation
         return data
 

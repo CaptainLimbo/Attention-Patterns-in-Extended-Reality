@@ -169,7 +169,7 @@ def convert_raw_data(
     save_root_path,
     use_task=["VRG"],
     window_size=120,
-    step_size=60,
+    step_size=120,
     openamount_placeholder=1,
     use_blink=True,
     use_center=False,

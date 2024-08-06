@@ -16,7 +16,6 @@ def discard_short_periods(all_extracted_periods, minimum_fixation_steps):
         if period[1] - period[0] >= minimum_fixation_steps
     ]
 
-
 def find_all_periods(signal, indices=[]):
     start = None
     all_periods = []
@@ -27,6 +26,9 @@ def find_all_periods(signal, indices=[]):
         else: # there is a start
             if not signal[i] or (len(indices) > 0 and indices[i] + 1 != indices[i + 1]):
                 all_periods.append((start, i))
+                # if len(indices) > 0 and indices[i] - indices[start] > 400:
+                #     print("start", start, "end", i, "indices", indices[start], indices[i])
+                #     print(indices[start:i+1])
                 start = None
     if start is not None and (len(indices) == 0 or indices[len(signal) - 1] - 1 == indices[len(signal)-2]):
         all_periods.append((start, len(signal) - 1))
