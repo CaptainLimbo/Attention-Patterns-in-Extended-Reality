@@ -1,8 +1,6 @@
-import copy
 import numpy as np
 import pandas as pd
 import os
-import json
 
 import offline.modules as m
 from offline.data import SudokuARGazeData, SudokuVRGazeData, aggregate_data

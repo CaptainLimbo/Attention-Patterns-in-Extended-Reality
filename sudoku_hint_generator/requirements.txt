@@ -1,0 +1,12 @@
+numpy
+pandas
+tensorflow-addons
+opencv-python
+tqdm
+tensorflow
+matplotlib
+pytest
+jupyter
+tensorflow-datasets
+scikit-image
+imutils
